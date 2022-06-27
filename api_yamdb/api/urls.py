@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 from .views import CategoryViewSet, GenreViewSet, TitleViewSet
 
 router = DefaultRouter()
-router.register('categorys', CategoryViewSet, basename='categorys')
+router.register('categories', CategoryViewSet, basename='categorys')
 router.register('genres', GenreViewSet, basename='genres')
 router.register('titles', TitleViewSet, basename='titles')
 
