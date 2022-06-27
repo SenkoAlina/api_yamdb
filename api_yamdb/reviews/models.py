@@ -1,5 +1,6 @@
-from unicodedata import category
 from django.db import models
+
+from .validators import validate_year
 
 
 class Category(models.Model):
@@ -45,9 +46,12 @@ class Title(models.Model):
     )
     year = models.IntegerField(
         verbose_name='Год выпуска',
+        validators=(validate_year,)
     )
     rating = models.IntegerField(
         verbose_name='Рейтинг',
+        null=True,
+        default=None,
     )
     description = models.TextField(
         verbose_name='Описание',
@@ -69,6 +73,7 @@ class Title(models.Model):
     rating = models.IntegerField(
         verbose_name='Рейтинг',
         null=True,
+        default=None,
     )
 
     def __str__(self):
