@@ -17,7 +17,8 @@ class Review(models.Model):
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE, related_name='reviews'
     )
-    score = models.IntegerField(default=0, null=True, blank=True)
+    score = models.PositiveSmallIntegerField(
+        'Рейтинг', validators=[MaxValueValidator(10)], default=0)
     pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
@@ -39,15 +40,4 @@ class Comment(models.Model):
     text = models.TextField()
     pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
-    )
-
-
-class Rating(models.Model):
-    score = models.PositiveSmallIntegerField(
-        'Рейтинг', validators=[MaxValueValidator(10)], default=0)
-    author = models.ForeignKey(
-        User, on_delete=models.CASCADE,
-    )
-    review = models.ForeignKey(
-        Review, on_delete=models.CASCADE, related_name='rating'
     )
