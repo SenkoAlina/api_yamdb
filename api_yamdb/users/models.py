@@ -1,6 +1,3 @@
-import string
-from random import random
-
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 # from django.contrib.auth.validators import UnicodeUsernameValidator
@@ -65,6 +62,7 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=150, blank=True)
     bio = models.TextField(blank=True, null=True)
     role = models.CharField(max_length=150, choices=CHOICES, default='user')
+    confirmation_code = models.CharField(max_length=10)
 
     objects = CustomUserManager()
 
@@ -86,16 +84,3 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'user'
         verbose_name_plural = 'users'
-
-
-def generate_confirmation_code():
-    return ''.join(random.choice(
-        string.ascii_uppercase + string.digits
-    ) for x in range(10))
-
-
-class ConfirmationCode(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    confirmation_code = models.CharField(
-        max_length=10, default=generate_confirmation_code
-    )
