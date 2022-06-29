@@ -5,4 +5,4 @@ class AdminPermission(permissions.BasePermission):
     def has_object_permission(self, request, view):
         return (
             request.user.is_authenticated
-            and request.user.role == 'admin')
+            and request.user.is_admin)

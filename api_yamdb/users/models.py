@@ -1,5 +1,5 @@
-# import string
-# from random import random
+import string
+from random import random
 
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
@@ -10,18 +10,23 @@ from django.utils.translation import ugettext_lazy as _
 
 class CustomUserManager(BaseUserManager):
 
-    def create_user(self, username, email, **extra_fields):
+    def create_user(self, username, email, password, **extra_fields):
         if username is None:
-            raise TypeError('Обязательное поле')
+            raise ValueError('Обязательное поле')
         if email is None:
-            raise TypeError('Обязательное поле')
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        user.set_unusable_password()
+            raise ValueError('Обязательное поле')
+        user = self.model(
+            username=username, email=self.normalize_email(email)
+        )
+        user.is_active = True
+        user.is_superuser = False
+        user.set_password(password)
         user.save()
+
         return user
 
-    def create_superuser(self, email, password, **extra_fields):
+    def create_superuser(self, username, email, password, **extra_fields):
+        user = user = self.create_user(username, email, password)
 
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
@@ -31,7 +36,8 @@ class CustomUserManager(BaseUserManager):
             raise ValueError(_('Superuser must have is_staff=True.'))
         if extra_fields.get('is_superuser') is not True:
             raise ValueError(_('Superuser must have is_superuser=True.'))
-        return self.create_user(email, password, **extra_fields)
+
+        return user
 
     def create_moderator(self, email, password, **extra_fields):
         extra_fields.setdefault('is_staff', True)
@@ -80,3 +86,16 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'user'
         verbose_name_plural = 'users'
+
+
+def generate_confirmation_code():
+    return ''.join(random.choice(
+        string.ascii_uppercase + string.digits
+    ) for x in range(10))
+
+
+class ConfirmationCode(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    confirmation_code = models.CharField(
+        max_length=10, default=generate_confirmation_code
+    )
