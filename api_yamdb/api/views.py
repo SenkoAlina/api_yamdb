@@ -1,13 +1,20 @@
+from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
+from rest_framework import filters, mixins, permissions, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 
 
-from reviews.models import Review, Title
+from reviews.models import Review, Title, Category, Genre, Title
 
-from .permissions import IsAuthorOrReadOnly
-from .serializers import ReviewSerializer, CommentSerializer
+from .filters import TitleFilterSet
+from .permissions import IsAuthorOrReadOnly, AdminOrReadOnly
+from .serializers import ReviewSerializer, CommentSerializer, CategorySerializer, GenreSerializer, ReadOnlyTitleSerializer, TitleSerializer
 
+
+class CreateListViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
+                        mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    pass
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
@@ -36,3 +43,36 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
         serializer.save(author=self.request.user, review=review)
+
+
+class CategoryViewSet(CreateListViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = (AdminOrReadOnly,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
+
+
+class GenreViewSet(CreateListViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = (AdminOrReadOnly,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.annotate(
+        average_rating=Avg('reviews__score')).order_by('name')
+    serializer_class = TitleSerializer
+    permission_classes = (AdminOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitleFilterSet
+
+    def get_serializer_class(self):
+        if self.action in ('retrieve', 'list'):
+            return ReadOnlyTitleSerializer
+        return TitleSerializer
+
