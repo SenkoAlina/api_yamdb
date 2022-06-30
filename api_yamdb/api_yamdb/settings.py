@@ -24,10 +24,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
+    'debug_toolbar',
     'djoser',
     'rest_framework_simplejwt',
     'users',
-    # 'django-extensions',
+    'reviews',
+    'api',
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
@@ -119,7 +122,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
-
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE':10,
 }
 
 SIMPLE_JWT = {
@@ -160,4 +164,4 @@ DJOSER = {
     # 'ACTIVATION_URL': '#/activate/{uid}/{token}',
     # 'SEND_ACTIVATION_EMAIL': True,
     # 'SERIALIZERS': {},
-}
+
