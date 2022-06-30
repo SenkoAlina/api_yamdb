@@ -1,7 +1,31 @@
-from unicodedata import category
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from reviews.models import Category, Genre, Title
+from reviews.models import Comment, Review, Category, Genre, Title
+
+User = get_user_model()
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        slug_field='username',
+        read_only=True
+    )
+
+    class Meta:
+        model = Review
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username'
+    )
+
+    class Meta:
+        fields = 'id', 'text', 'author', 'pub_date'
+        model = Comment
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -49,3 +73,4 @@ class ReadOnlyTitleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = 'id', 'name', 'year', 'rating', 'description', 'genre', 'category',
+
