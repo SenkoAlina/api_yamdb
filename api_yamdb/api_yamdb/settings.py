@@ -25,7 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
-    'debug_toolbar',
+    # 'debug_toolbar',
     'djoser',
     'rest_framework_simplejwt',
     'users',
@@ -123,7 +123,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE':10,
+    'PAGE_SIZE': 10,
 }
 
 SIMPLE_JWT = {
@@ -165,3 +165,4 @@ DJOSER = {
     # 'SEND_ACTIVATION_EMAIL': True,
     # 'SERIALIZERS': {},
 
+}
