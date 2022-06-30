@@ -1,13 +1,14 @@
 # from django.conf import settings
 # from django.core import validators
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenViewBase
 
 from users.models import User
-from users.serializers import UserSerializer, CustomTokenObtainPairSerializer
+from users.serializers import UserSerializer, CustomTokenObtainSerializer
 from users.permissions import AdminPermission
 
 
@@ -15,6 +16,10 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (AdminPermission, )
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('username',)
+    pagination_class = PageNumberPagination
+    lookup_field = 'username'
 
     @action(methods=['GET', 'POST'], detail=True)
     def create_users(self, request):
@@ -51,4 +56,4 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class CustomObtainPairView(TokenViewBase):
-    serializer_class = CustomTokenObtainPairSerializer
+    serializer_class = CustomTokenObtainSerializer

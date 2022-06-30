@@ -9,9 +9,6 @@ app_name = 'users'
 
 router_v1 = routers.DefaultRouter()
 router_v1.register('users', UserViewSet, basename='user')
-router_v1.register(
-    r'users(?P<username>[\w.@+-]+)/', UserViewSet, basename='user'
-)
 
 urlpatterns = [
     path('v1/', include(router_v1.urls)),

@@ -1,58 +1,74 @@
+# import jwt
+
+# from datetime import datetime, timedelta
+
+# from django.conf import settings
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.auth.base_user import BaseUserManager
-from django.contrib.auth.models import AbstractUser
-# from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+
+# from django.contrib.auth.models import AbstractUser
+# from django.contrib.auth.validators import UnicodeUsernameValidator
+# from django.utils.translation import ugettext_lazy as _
 
 
 class CustomUserManager(BaseUserManager):
 
-    def create_user(self, username, email, password, **extra_fields):
-        if username is None:
-            raise ValueError('Обязательное поле')
-        if email is None:
-            raise ValueError('Обязательное поле')
+    def create_user(self, username, email, password=None, **extra_fields):
+        if not username:
+            raise ValueError("User must have an username")
+        if not email:
+            raise ValueError("User must have an email")
+
         user = self.model(
             username=username, email=self.normalize_email(email)
         )
-        user.is_active = True
-        user.is_superuser = False
+        user.is_admin = False
+        user.is_staff = False
+        user.save(using=self._db)
+
+        return user
+
+    def create_superuser(self, username, email, password=None, **extra_fields):
+
+        if not username:
+            raise ValueError("User must have an username")
+        if not email:
+            raise ValueError("User must have an email")
+
+        user = self.model(
+            username=username, email=self.normalize_email(email)
+        )
         user.set_password(password)
-        user.save()
+        user.is_admin = True
+        user.is_staff = True
+        user.is_superuser = True
+        user.save(using=self._db)
 
         return user
 
-    def create_superuser(self, username, email, password, **extra_fields):
-        user = user = self.create_user(username, email, password)
+    def create_moderator(self, username, email, password=None, **extra_fields):
 
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('is_active', True)
+        if not username:
+            raise ValueError("User must have an username")
+        if not email:
+            raise ValueError("User must have an email")
 
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError(_('Superuser must have is_staff=True.'))
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError(_('Superuser must have is_superuser=True.'))
+        user = self.model(
+            username=username, email=self.normalize_email(email)
+        )
+        user.set_password(password)
+        user.is_admin = False
+        user.is_staff = True
 
         return user
 
-    def create_moderator(self, email, password, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', False)
-        extra_fields.setdefault('is_active', True)
 
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError(_('Moderator must have is_staff=True.'))
-        if extra_fields.get('is_superuser') is True:
-            raise ValueError(_('Moderator cannot have is_superuser=True.'))
-        return self.create_user(email, password, **extra_fields)
-
-
-class User(AbstractUser):
+class User(AbstractBaseUser, PermissionsMixin):
 
     CHOICES = (
         ('user', 'user'),
-        ('moder', 'moderator'),
+        ('moderator', 'moderator'),
         ('admin', 'admin'),
     )
 
@@ -63,24 +79,22 @@ class User(AbstractUser):
     bio = models.TextField(blank=True, null=True)
     role = models.CharField(max_length=150, choices=CHOICES, default='user')
     confirmation_code = models.CharField(max_length=10)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
 
     objects = CustomUserManager()
 
-    def str(self):
+    @staticmethod
+    def has_perm(perm, obj=None):
+        return True
+
+    @staticmethod
+    def has_module_perms(app_label):
+        return True
+
+    def __str__(self):
         return self.username
-
-    @property
-    def is_admin(self):
-        return self.role == 'admin'
-
-    @property
-    def is_moder(self):
-        return self.role == 'moder'
-
-    @property
-    def is_auth(self):
-        return self.role == 'user'
-
-    class Meta:
-        verbose_name = 'user'
-        verbose_name_plural = 'users'
