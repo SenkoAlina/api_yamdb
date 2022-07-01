@@ -1,21 +1,16 @@
 from django.urls import include, path
-from rest_framework import routers
+from rest_framework.routers import DefaultRouter
 
-from users.views import CustomObtainPairView
-
+from users import views
 from .views import UserViewSet
 
 app_name = 'users'
 
-router_v1 = routers.DefaultRouter()
-router_v1.register('users', UserViewSet, basename='user')
+router_v1 = DefaultRouter()
+router_v1.register(r'users', UserViewSet, basename='user')
 
 urlpatterns = [
-    path('v1/', include(router_v1.urls)),
-    # path('v1/', include('djoser.urls')),
-    path(
-        'v1/auth/token/',
-        CustomObtainPairView.as_view(),
-        name='token_obtain_pair'
-    ),
+    path('v1/auth/signup/', views.create_user, name='register'),
+    path('v1/auth/token/', views.create_token, name='token'),
+    path('v1/', include(router_v1.urls))
 ]
