@@ -45,6 +45,13 @@ class CommentViewSet(viewsets.ModelViewSet):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
         serializer.save(author=self.request.user, review=review)
 
+    def perform_destroy(self, instance):
+        try:
+            instance.delete()
+        except:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class CategoryViewSet(CreateListViewSet):
     queryset = Category.objects.all()

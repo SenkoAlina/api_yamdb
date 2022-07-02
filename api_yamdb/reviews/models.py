@@ -114,7 +114,7 @@ class Review(models.Model):
         return self.text
 
     class Meta:
-        unique_together = ('author',)
+        unique_together = ('author', 'title')
 
 
 class Comment(models.Model):
