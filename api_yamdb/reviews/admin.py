@@ -4,8 +4,7 @@ from .models import Review, Title, Comment, Category, Genre
 
 class TitleAdmin(admin.ModelAdmin):
 
-    list_display = ('name', 'id', 'description',
-                    'rating', 'category',)
+    list_display = ('id',)
 
 
 class CommentAdmin(admin.ModelAdmin):
@@ -32,7 +31,7 @@ class GenreAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug',)
 
     search_fields = ('name',)
-    
+
 
 admin.site.register(Review, ReviewAdmin)
 
@@ -43,4 +42,3 @@ admin.site.register(Comment, CommentAdmin)
 admin.site.register(Category, CategoryAdmin,)
 
 admin.site.register(Genre, GenreAdmin)
-
