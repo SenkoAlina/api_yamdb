@@ -4,7 +4,8 @@ from .models import Review, Title, Comment, Category, Genre
 
 class TitleAdmin(admin.ModelAdmin):
 
-    list_display = ('id',)
+    list_display = ('name', 'id', 'description',
+                    'rating', 'category',)
 
 
 class CommentAdmin(admin.ModelAdmin):
