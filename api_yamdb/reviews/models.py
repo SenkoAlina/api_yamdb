@@ -1,8 +1,8 @@
 from django.core.validators import MaxValueValidator
 from django.db import models
+from users.models import User
 
 from .validators import validate_year
-from users.models import User
 
 
 class Category(models.Model):
@@ -78,7 +78,8 @@ class Title(models.Model):
 
 
 class GenreTitle(models.Model):
-    """Класс GenreTitle описывает модель для хранения информации о связях между произведениями и жанрами"""
+    """Класс GenreTitle описывает модель для хранения
+    информации о связях между произведениями и жанрами"""
 
     title = models.ForeignKey(
         Title,

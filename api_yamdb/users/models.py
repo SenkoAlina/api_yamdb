@@ -1,100 +1,51 @@
-# import jwt
-
-# from datetime import datetime, timedelta
-
-# from django.conf import settings
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-# from django.contrib.auth.models import AbstractUser
-# from django.contrib.auth.validators import UnicodeUsernameValidator
-# from django.utils.translation import ugettext_lazy as _
+from users.generate_code import generate_confirmation_code
 
 
-class CustomUserManager(BaseUserManager):
-
-    def create_user(self, username, email, password=None, **extra_fields):
-        if not username:
-            raise ValueError("User must have an username")
-        if not email:
-            raise ValueError("User must have an email")
-
-        user = self.model(
-            username=username, email=self.normalize_email(email)
-        )
-        user.is_admin = False
-        user.is_staff = False
-        user.save(using=self._db)
-
-        return user
-
-    def create_superuser(self, username, email, password=None, **extra_fields):
-
-        if not username:
-            raise ValueError("User must have an username")
-        if not email:
-            raise ValueError("User must have an email")
-
-        user = self.model(
-            username=username, email=self.normalize_email(email)
-        )
-        user.set_password(password)
-        user.is_admin = True
-        user.is_staff = True
-        user.is_superuser = True
-        user.save(using=self._db)
-
-        return user
-
-    def create_moderator(self, username, email, password=None, **extra_fields):
-
-        if not username:
-            raise ValueError("User must have an username")
-        if not email:
-            raise ValueError("User must have an email")
-
-        user = self.model(
-            username=username, email=self.normalize_email(email)
-        )
-        user.set_password(password)
-        user.is_admin = False
-        user.is_staff = True
-
-        return user
-
-
-class User(AbstractBaseUser, PermissionsMixin):
-
-    CHOICES = (
-        ('user', 'user'),
-        ('moderator', 'moderator'),
-        ('admin', 'admin'),
+class User(AbstractUser):
+    USER = 'user'
+    ADMIN = 'admin'
+    MODERATOR = 'moderator'
+    ROLES = (
+        (USER, 'user'),
+        (ADMIN, 'admin'),
+        (MODERATOR, 'moderator')
     )
 
-    username = models.CharField(max_length=150, unique=True)
-    email = models.EmailField(max_length=254, unique=True)
-    first_name = models.CharField(max_length=150, blank=True)
-    last_name = models.CharField(max_length=150, blank=True)
-    bio = models.TextField(blank=True, null=True)
-    role = models.CharField(max_length=150, choices=CHOICES, default='user')
-    confirmation_code = models.CharField(max_length=10)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)
+    bio = models.TextField(
+        blank=True, null=True
+    )
+    email = models.EmailField(
+        max_length=254, unique=True
+    )
+    password = models.CharField(
+        'password', max_length=128, blank=True, null=True
+    )
+    role = models.CharField(
+        max_length=20, choices=ROLES, default=USER
+    )
+    confirmation_code = models.CharField(
+        max_length=100, null=True, default=generate_confirmation_code()
+    )
 
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']
+    class Meta:
+        ordering = ['-id']
 
-    objects = CustomUserManager()
+    def save(self, *args, **kwargs):
+        if self.role == self.ADMIN:
+            self.is_staff = True
+        super().save(*args, **kwargs)
 
-    @staticmethod
-    def has_perm(perm, obj=None):
-        return True
+    @property
+    def is_admin(self):
+        return self.role == self.ADMIN
 
-    @staticmethod
-    def has_module_perms(app_label):
-        return True
+    @property
+    def is_moderator(self):
+        return self.role == self.MODERATOR
 
-    def __str__(self):
-        return self.username
+    @property
+    def is_user(self):
+        return self.role == self.USER
