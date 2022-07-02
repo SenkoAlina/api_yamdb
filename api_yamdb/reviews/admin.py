@@ -32,7 +32,7 @@ class GenreAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug',)
 
     search_fields = ('name',)
-
+    
 
 admin.site.register(Review, ReviewAdmin)
 
@@ -43,3 +43,4 @@ admin.site.register(Comment, CommentAdmin)
 admin.site.register(Category, CategoryAdmin,)
 
 admin.site.register(Genre, GenreAdmin)
+

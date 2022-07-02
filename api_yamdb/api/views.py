@@ -1,20 +1,21 @@
-from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, permissions, viewsets
 from rest_framework.pagination import LimitOffsetPagination
-
-
-from reviews.models import Review, Title, Category, Genre, Title
+from reviews.models import Category, Genre, Review, Title
 
 from .filters import TitleFilterSet
-from .permissions import IsAuthorOrReadOnly, AdminOrReadOnly
-from .serializers import ReviewSerializer, CommentSerializer, CategorySerializer, GenreSerializer, ReadOnlyTitleSerializer, TitleSerializer
+from .permissions import AdminOrReadOnly, IsAuthorOrReadOnly
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReadOnlyTitleSerializer,
+                          ReviewSerializer, TitleSerializer)
 
 
 class CreateListViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
                         mixins.DestroyModelMixin, viewsets.GenericViewSet):
     pass
+
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
@@ -75,4 +76,3 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.action in ('retrieve', 'list'):
             return ReadOnlyTitleSerializer
         return TitleSerializer
-
