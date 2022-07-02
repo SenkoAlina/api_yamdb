@@ -1,4 +1,4 @@
-from django.core.validators import MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from users.models import User
 
@@ -50,11 +50,6 @@ class Title(models.Model):
         verbose_name='Год выпуска',
         validators=(validate_year,)
     )
-    rating = models.IntegerField(
-        verbose_name='Рейтинг',
-        null=True,
-        default=None,
-    )
     description = models.TextField(
         verbose_name='Описание',
         null=True,
@@ -72,6 +67,11 @@ class Title(models.Model):
         null=True,
         related_name='titles',
     )
+    rating = models.IntegerField(
+        verbose_name='Рейтинг',
+        null=True,
+    )
+
 
     def __str__(self):
         return self.name
@@ -104,8 +104,12 @@ class Review(models.Model):
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE, related_name='reviews'
     )
-    score = models.PositiveSmallIntegerField(
-        'Рейтинг', validators=[MaxValueValidator(10)], default=0)
+    score = models.SmallIntegerField(
+        validators=[
+            MaxValueValidator(10),
+            MinValueValidator(1)
+        ],
+        default=1,)
     pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
