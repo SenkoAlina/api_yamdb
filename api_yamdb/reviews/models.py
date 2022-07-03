@@ -105,7 +105,7 @@ class Review(models.Model):
         Title, on_delete=models.CASCADE, related_name='reviews'
     )
     score = models.PositiveSmallIntegerField(
-        'Рейтинг', validators=[MaxValueValidator(10)], default=1)
+        'Рейтинг', validators=[MaxValueValidator(10)], default=0)
     pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
