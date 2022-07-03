@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from reviews.models import Category, Genre, Review, Title
 
 from .filters import TitleFilterSet
-from .permissions import (AdminOrReadOnly, AuthorAdminModeratorOrReadOnly)
+from .permissions import AdminOrReadOnly, AuthorAdminModeratorOrReadOnly
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReadOnlyTitleSerializer,
                           ReviewSerializer, TitleSerializer)
@@ -47,10 +47,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, review=review)
 
     def perform_destroy(self, instance):
-        try:
-            instance.delete()
-        except:
-            pass
+        instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -73,8 +70,8 @@ class GenreViewSet(CreateListViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.annotate(
-        average_rating=Avg('reviews__score')).order_by('id')
+    queryset = Title.objects.all().annotate(
+        rating=Avg('reviews__score')).order_by('-id')
     serializer_class = TitleSerializer
     permission_classes = (AdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)

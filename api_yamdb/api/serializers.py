@@ -6,8 +6,7 @@ from reviews.models import Comment, Review, Category, Genre, Title
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         slug_field='username',
-        read_only=True,
-        default=serializers.CurrentUserDefault()
+        read_only=True
     )
 
     class Meta:
@@ -18,8 +17,11 @@ class ReviewSerializer(serializers.ModelSerializer):
         request = self.context['request']
         title_id = self.context['view'].kwargs.get('title_id')
         title = get_object_or_404(Title, id=title_id)
-        if (request.method == 'POST' and Review.objects.filter(
-            title=title, author=request.user).exists()):
+        if (
+            request.method == 'POST' and Review.objects.filter(
+                title=title, author=request.user
+            ).exists()
+        ):
             raise serializers.ValidationError('Вы уже оставили отзыв')
         return data
 
@@ -27,8 +29,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True,
-        slug_field='username',
-        default=serializers.CurrentUserDefault()
+        slug_field='username'
     )
 
     class Meta:
@@ -71,7 +72,7 @@ class TitleSerializer(serializers.ModelSerializer):
         model = Title
         fields = (
             'id', 'name', 'year',
-            'rating', 'description', 'genre', 'category'
+            'description', 'genre', 'category'
         )
 
 
