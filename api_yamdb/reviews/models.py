@@ -6,7 +6,6 @@ from .validators import validate_year
 
 
 class Category(models.Model):
-    """Класс Category описывает модель для хранения информации о категориях"""
 
     name = models.CharField(
         verbose_name='Название',
@@ -23,7 +22,6 @@ class Category(models.Model):
 
 
 class Genre(models.Model):
-    """Класс Genre описывает модель для хранения информации о жанрах"""
 
     name = models.CharField(
         verbose_name='Название',
@@ -40,7 +38,6 @@ class Genre(models.Model):
 
 
 class Title(models.Model):
-    """Класс Title описывает модель для хранения информации о произведениях"""
 
     name = models.CharField(
         verbose_name='Название',
@@ -73,8 +70,6 @@ class Title(models.Model):
 
 
 class GenreTitle(models.Model):
-    """Класс GenreTitle описывает модель для хранения
-    информации о связях между произведениями и жанрами"""
 
     title = models.ForeignKey(
         Title,
