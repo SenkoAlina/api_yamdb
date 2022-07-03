@@ -1,15 +1,13 @@
-from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from reviews.models import Comment, Review, Category, Genre, Title
-
-User = get_user_model()
 
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         slug_field='username',
-        read_only=True
+        read_only=True,
+        default=serializers.CurrentUserDefault()
     )
 
     class Meta:
@@ -29,7 +27,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True,
-        slug_field='username'
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
     )
 
     class Meta:

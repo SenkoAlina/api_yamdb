@@ -1,12 +1,13 @@
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, viewsets
+from rest_framework import filters, mixins, status, viewsets
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.response import Response
 from reviews.models import Category, Genre, Review, Title
 
 from .filters import TitleFilterSet
-from .permissions import AdminOrReadOnly, IsAuthorOrReadOnly
+from .permissions import (AdminOrReadOnly, AuthorAdminModeratorOrReadOnly)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReadOnlyTitleSerializer,
                           ReviewSerializer, TitleSerializer)
@@ -19,7 +20,7 @@ class CreateListViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthorOrReadOnly, ]
+    permission_classes = [AuthorAdminModeratorOrReadOnly, ]
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
@@ -34,7 +35,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthorOrReadOnly, ]
+    permission_classes = [AuthorAdminModeratorOrReadOnly, ]
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
@@ -73,7 +74,7 @@ class GenreViewSet(CreateListViewSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(
-        average_rating=Avg('reviews__score')).order_by('name')
+        average_rating=Avg('reviews__score')).order_by('id')
     serializer_class = TitleSerializer
     permission_classes = (AdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
