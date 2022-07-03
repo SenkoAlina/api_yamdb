@@ -5,6 +5,8 @@ from rest_framework import filters, mixins, status, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from reviews.models import Category, Genre, Review, Title
+from rest_framework.response import Response
+from rest_framework import status
 
 from .filters import TitleFilterSet
 from .permissions import AdminOrReadOnly, AuthorAdminModeratorOrReadOnly
@@ -46,6 +48,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
         serializer.save(author=self.request.user, review=review)
 
+
     def perform_destroy(self, instance):
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -71,11 +74,15 @@ class GenreViewSet(CreateListViewSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(
-        rating=Avg('reviews__score')).order_by('-id')
+    rating=Avg('reviews__score')).order_by('-id')
     serializer_class = TitleSerializer
     permission_classes = (AdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilterSet
+
+    def get_queryset(self):
+        rating = Rating.objects.aggregate(Avg('score'))
+        return rating
 
     def get_serializer_class(self):
         if self.action in ('retrieve', 'list'):
