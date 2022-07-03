@@ -1,9 +1,6 @@
-from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from reviews.models import Comment, Review, Category, Genre, Title
-
-User = get_user_model()
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -20,8 +17,11 @@ class ReviewSerializer(serializers.ModelSerializer):
         request = self.context['request']
         title_id = self.context['view'].kwargs.get('title_id')
         title = get_object_or_404(Title, id=title_id)
-        if (request.method == 'POST' and Review.objects.filter(
-            title=title, author=request.user).exists()):
+        if (
+            request.method == 'POST' and Review.objects.filter(
+                title=title, author=request.user
+            ).exists()
+        ):
             raise serializers.ValidationError('Вы уже оставили отзыв')
         return data
 
@@ -72,7 +72,7 @@ class TitleSerializer(serializers.ModelSerializer):
         model = Title
         fields = (
             'id', 'name', 'year',
-            'rating', 'description', 'genre', 'category'
+            'description', 'genre', 'category'
         )
 
 
