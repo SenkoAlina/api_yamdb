@@ -15,19 +15,17 @@ class User(AbstractUser):
     )
 
     bio = models.TextField(
-        blank=True, null=True
+        verbose_name='Информация', blank=True, null=True
     )
     email = models.EmailField(
-        max_length=254, unique=True
-    )
-    password = models.CharField(
-        'password', max_length=128, blank=True, null=True
+        verbose_name='Почта', max_length=254, unique=True
     )
     role = models.CharField(
-        max_length=20, choices=ROLES, default=USER
+        verbose_name='Роль', max_length=20, choices=ROLES, default=USER
     )
     confirmation_code = models.CharField(
-        max_length=100, null=True, default=generate_confirmation_code()
+        verbose_name='Код подтверждения', max_length=100,
+        null=True, default=generate_confirmation_code()
     )
 
     class Meta:
@@ -40,7 +38,7 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.role == self.ADMIN
+        return self.role == self.ADMIN or self.is_superuser
 
     @property
     def is_moderator(self):
