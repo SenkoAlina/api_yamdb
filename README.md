@@ -98,7 +98,7 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-### Как запустить проект:
+### База данных:
 
 В директории /api_yamdb/static/data подготовлены несколько файлов в формате csv с контентом для ресурсов Users, Titles, Categories, Genres, Review и Comments. Заполните базу данных контентом из приложенных csv-файлов.
 
