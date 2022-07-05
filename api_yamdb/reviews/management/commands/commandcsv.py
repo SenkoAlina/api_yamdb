@@ -33,4 +33,8 @@ class Command(BaseCommand):
                     if 'author' in row:
                         row['author'] = User.objects.get(pk=row['author'])
                         print(row['author'])
+                    if 'category' in row:
+                        row['category'] = Category.objects.get(
+                            pk=row['category'])
+                        print(row['category'])
                     model.objects.create(**row)
