@@ -1,6 +1,62 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
+
 from reviews.models import Category, Comment, Review, Genre, Title
+from users.models import User
+
+
+class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        validators=[
+            UniqueValidator(queryset=User.objects.all())
+        ],
+        required=True,
+    )
+    email = serializers.EmailField(
+        validators=[
+            UniqueValidator(queryset=User.objects.all())
+        ]
+    )
+
+    class Meta:
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role',
+        )
+        model = User
+        lookup_field = 'username'
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+
+    email = serializers.EmailField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    username = serializers.CharField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())],
+    )
+
+    class Meta:
+        model = User
+        fields = ('username', 'email',)
+
+    def validate(self, data):
+        if data['username'] == 'me':
+            raise serializers.ValidationError(
+                "Нельзя использовать данное имя!"
+            )
+        return data
+
+
+class TokenSerializer(serializers.ModelSerializer):
+    username = serializers.CharField()
+    confirmation_code = serializers.CharField()
+
+    class Meta:
+        model = User
+        fields = ('username', 'confirmation_code')
 
 
 class ReviewSerializer(serializers.ModelSerializer):

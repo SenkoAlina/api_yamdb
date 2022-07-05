@@ -98,3 +98,101 @@ python manage.py migrate
 python manage.py runserver
 ```
 
+### Как запустить проект:
+
+В директории /api_yamdb/static/data подготовлены несколько файлов в формате csv с контентом для ресурсов Users, Titles, Categories, Genres, Review и Comments. Заполните базу данных контентом из приложенных csv-файлов.
+
+Для этого выполните команду:
+
+```
+python manage.py commandcsv
+```
+### Документация:
+
+Документация к проекту доступна по адресу:
+
+```
+http://127.0.0.1:8000/redoc/
+```
+
+### Ссылки на авторов:
+
+Над данным проектом работали:
+
+```
+https://github.com/MrKep
+```
+
+```
+https://github.com/roteschild
+```
+
+```
+https://github.com/SenkoAlina
+```
+
+### Примеры запросов и ответов:
+
+Запрос на получение списка всех произведений. 
+
+```
+http://127.0.0.1:8000/api/v1/titles/
+```
+В ответ должно вернуться:
+
+```
+[
+  {
+    "count": 0,
+    "next": "string",
+    "previous": "string",
+    "results": [
+      {
+        "id": 0,
+        "name": "string",
+        "year": 0,
+        "rating": 0,
+        "description": "string",
+        "genre": [
+          {
+            "name": "string",
+            "slug": "string"
+          }
+        ],
+        "category": {
+          "name": "string",
+          "slug": "string"
+        }
+      }
+    ]
+  }
+]
+```
+
+Запрос на получение списка всех отзывов к конкретному произведению:
+
+```
+http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/
+```
+
+В ответ должно вернуться:
+
+```
+[
+  {
+    "count": 0,
+    "next": "string",
+    "previous": "string",
+    "results": [
+      {
+        "id": 0,
+        "text": "string",
+        "author": "string",
+        "score": 1,
+        "pub_date": "2019-08-24T14:15:22Z"
+      }
+    ]
+  }
+]
+```
+

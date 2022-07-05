@@ -87,17 +87,19 @@ class GenreTitle(models.Model):
 
 
 class Review(models.Model):
-    text = models.TextField()
+    text = models.TextField(verbose_name='Текст',)
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='reviews'
+        User, on_delete=models.CASCADE,
+        verbose_name='Автор', related_name='reviews'
     )
     title = models.ForeignKey(
-        Title, on_delete=models.CASCADE, related_name='reviews'
+        Title, on_delete=models.CASCADE,
+        verbose_name='Произведение', related_name='reviews'
     )
     score = models.PositiveSmallIntegerField(
-        'Рейтинг', validators=[MaxValueValidator(10)], default=0)
+        verbose_name='Рейтинг', validators=[MaxValueValidator(10)], default=0)
     pub_date = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True
+        verbose_name='Дата добавления', auto_now_add=True, db_index=True
     )
 
     def __str__(self):
@@ -109,12 +111,14 @@ class Review(models.Model):
 
 class Comment(models.Model):
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='comments'
+        User, on_delete=models.CASCADE,
+        verbose_name='Автор', related_name='comments'
     )
     review = models.ForeignKey(
-        Review, on_delete=models.CASCADE, related_name='comments'
+        Review, on_delete=models.CASCADE,
+        verbose_name='Отзыв', related_name='comments'
     )
-    text = models.TextField()
+    text = models.TextField(verbose_name='Текст',)
     pub_date = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True
+        verbose_name='Дата добавления', auto_now_add=True, db_index=True
     )

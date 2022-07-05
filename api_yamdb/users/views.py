@@ -10,8 +10,8 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from users.models import User
 
-from .permissions import AdminPermission
-from .serializers import RegisterSerializer, TokenSerializer, UserSerializer
+from api.permissions import AdminPermission
+from api.serializers import RegisterSerializer, TokenSerializer, UserSerializer
 from api_yamdb.settings import ADMIN_EMAIL
 
 
@@ -71,28 +71,6 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ('username',)
     pagination_class = PageNumberPagination
     lookup_field = 'username'
-
-    @action(
-        methods=['GET', 'POST'],
-        detail=True
-    )
-    def create_users(self, request):
-        user_list = User.objects.all()
-        serializer = UserSerializer(user_list, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-
-    @action(
-        methods=['GET', 'PATCH', 'DELETE'],
-        detail=True
-    )
-    def user_detail_profile(self, request):
-        user = get_object_or_404(User, username=self.request.data['username'])
-        serializer = UserSerializer(user, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(role=user.role, partial=True)
-        return Response(serializer.data)
 
     @action(
         methods=['GET', 'PATCH'],
