@@ -10,9 +10,9 @@ FILES = {
     'category': Category,
     'genre': Genre,
     'titles': Title,
+    'genre_title': Title,
     'review': Review,
     'comments': Comment,
-
 }
 
 
@@ -21,7 +21,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for file, model in FILES.items():
-            print(file)
             with open(
                 f'static/data/{file}.csv',
                 newline='',
@@ -29,12 +28,16 @@ class Command(BaseCommand):
             ) as csvfile:
                 reader = csv.DictReader(csvfile)
                 for row in reader:
-                    print(row)
+
+                    if file == 'genre_title':
+                        genre = Genre.objects.get(id=row['genre_id'])
+                        title = model.objects.get(id=row['title_id'])
+                        title.genre.add(genre)
+                        continue
+
                     if 'author' in row:
                         row['author'] = User.objects.get(pk=row['author'])
-                        print(row['author'])
                     if 'category' in row:
                         row['category'] = Category.objects.get(
                             pk=row['category'])
-                        print(row['category'])
                     model.objects.create(**row)
