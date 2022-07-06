@@ -28,10 +28,9 @@ class Command(BaseCommand):
             ) as csvfile:
                 reader = csv.DictReader(csvfile)
                 for row in reader:
-
                     if file == 'genre_title':
-                        genre = Genre.objects.get(id=row['genre_id'])
-                        title = model.objects.get(id=row['title_id'])
+                        genre = Genre.objects.get(pk=row['genre_id'])
+                        title = model.objects.get(pk=row['title_id'])
                         title.genre.add(genre)
                         continue
 
